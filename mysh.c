@@ -3,6 +3,8 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "builtins.h"
 #include "io_helpers.h"
@@ -12,11 +14,20 @@
 
 
 int main(int argc, char* argv[]) {
-    char *prompt = "mysh$ "; // TODO Step 1, Uncomment this.
+    char *prompt = "shelly$ "; // TODO Step 1, Uncomment this.
 
     char input_buf[MAX_STR_LEN + 1];
     input_buf[MAX_STR_LEN] = '\0';
     char *token_arr[MAX_STR_LEN] = {NULL};
+
+    // Declare linked variables
+    head_var = (struct linked_v*)malloc(sizeof(struct linked_v));
+    char* firstname = "Author";
+    char* firstval = "Ekenedillichukwu Akuneme";
+    strcpy(head_var->name, firstname);
+    strcpy(head_var->value, firstval);
+    head_var->next = NULL;
+    tail_var = head_var;
     
    
 
@@ -34,11 +45,48 @@ int main(int argc, char* argv[]) {
 
         // Clean exit
         if (ret != -1 && token_count == 1 && (strcmp("exit", token_arr[0]) == 0)) {
+            printf("Exiting.....\n");
+            sleep(1);
             break;
         }
 
         // Command execution
-        if (token_count >= 1) {
+        else if (token_count == 1){
+            char* needle = "=";
+            char* substr = strstr(token_arr[0], needle);
+            if (substr != NULL){
+                //variable implementation
+                char declaration[64];
+                char* name; 
+                char value[64]; 
+                strcpy(declaration, token_arr[0]);
+                name = strtok(declaration, needle);
+                strcpy(value, substr + 1);
+                struct linked_v* present;
+                present = is_declared(name);
+                if (strncmp("$", value, 1)==0 && strlen(value) > 1)
+                {
+                    struct linked_v* var = is_declared(value + 1);
+                    if (var != NULL)
+                    {
+                        strcpy(value, var->value);
+                    }
+                        
+                }
+
+                if (present != NULL)
+                {
+                    change_variable(present, value);
+                }
+                else
+                {   
+                    add_variable(name, value);
+                }
+
+
+            }
+        }
+        else if (token_count > 1) {
             bn_ptr builtin_fn = check_builtin(token_arr[0]);
             if (builtin_fn != NULL) {
                 ssize_t err = builtin_fn(token_arr);
@@ -51,6 +99,6 @@ int main(int argc, char* argv[]) {
         }
 
     }
-
+    free_vars();
     return 0;
 }
