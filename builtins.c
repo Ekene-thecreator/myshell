@@ -31,13 +31,27 @@ ssize_t bn_echo(char **tokens) {
     while (tokens[index] != NULL) {
         // TODO:
         // Implement the echo command
-	display_message(tokens[index]);
-        if (tokens[index +1] != NULL) {
-            display_message(" ");
+        char* entry = tokens[index];
+        char* dollar = "$";
+        if (strncmp(dollar, entry, 1) == 0)
+        {   
+            struct linked_v* variable = is_declared(entry + 1);
+            if (variable != NULL)
+            {
+                display_message(variable->value);
+            }
+            else{
+                display_message(tokens[index]);
+            }         
         }
-
-        index += 1;
-
+        else{
+            display_message(tokens[index]);
+                if (tokens[index +1] != NULL) {
+                    display_message(" ");
+                }
+                
+            }
+    index += 1;
     }
     display_message("\n");
 
