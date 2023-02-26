@@ -10,6 +10,8 @@
  */
 typedef ssize_t (*bn_ptr)(char **);
 ssize_t bn_echo(char **tokens);
+ssize_t bn_cat(char** tokens);
+ssize_t bn_wc(char** tokens);
 
 
 /* Return: index of builtin or -1 if cmd doesn't match a builtin
@@ -19,8 +21,8 @@ bn_ptr check_builtin(const char *cmd);
 
 /* BUILTINS and BUILTINS_FN are parallel arrays of length BUILTINS_COUNT
  */
-static const char * const BUILTINS[] = {"echo"};
-static const bn_ptr BUILTINS_FN[] = {bn_echo, NULL};    // Extra null element for 'non-builtin'
+static const char * const BUILTINS[] = {"echo", "cat", "wc"};
+static const bn_ptr BUILTINS_FN[] = {bn_echo, bn_cat, bn_wc, NULL};    // Extra null element for 'non-builtin'
 static const size_t BUILTINS_COUNT = sizeof(BUILTINS) / sizeof(char *);
 
 #endif

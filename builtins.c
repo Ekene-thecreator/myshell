@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include "builtins.h"
 #include "io_helpers.h"
 #include "variables.h"
@@ -56,4 +57,49 @@ ssize_t bn_echo(char **tokens) {
     display_message("\n");
 
     return 0;
+}
+
+ssize_t bn_cat(char** tokens){
+    char* filename = tokens[1];
+    FILE * fptr = fopen(filename, "r");
+    char line[64];
+    while (fgets(line, 64, fptr) != 0)
+    {
+        printf("%s\n", line);
+    }
+
+    return 0;
+}
+
+ssize_t bn_wc(char** tokens){
+    char* filename = tokens[1];
+    FILE * fptr = fopen(filename, "r");
+    char buff[64];
+    int word_count, line_count, character_count;
+    word_count = 0;
+    line_count = 0;
+    character_count = 0;
+    while (fgets(buff, 64, fptr) != 0)
+    {
+        char line[64];
+        strcpy(line, buff);
+        char* word;
+        word = strtok(line, " ");
+        while (word != NULL)
+        {
+            word_count += 1;
+            character_count += strlen(word);
+            word = strtok(NULL, " ");
+        }
+        line_count += 1;
+        
+    }
+    printf("\n=================\n");
+    printf("Line count: %d\n", line_count);
+    printf("Word count: %d\n", word_count);
+    printf("Character count: %d\n", character_count);
+    printf("=================\n\n");
+
+    return 0;
+
 }
